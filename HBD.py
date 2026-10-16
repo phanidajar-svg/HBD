@@ -60,11 +60,25 @@ div.stButton > button {{
 }}
 div.stButton > button:hover {{ background: #e63e68; color: white; border-color: #e63e68; }}
 div[data-testid="stRadio"] label {{ color: {INK} !important; }}
+/* Compact numeric fields: tap a Sudoku cell and type with the phone keypad. */
+div[data-testid="stNumberInput"] button {{ display:none !important; }}
+div[data-testid="stNumberInput"] input {{ text-align:center !important; padding-left:0.1rem !important; padding-right:0.1rem !important; font-size:0.95rem !important; }}
+div[data-testid="stNumberInput"] div {{ border-radius:5px !important; }}
 .heart-title {{ text-align:center; color:{ACC}; font-size: 2.4rem; font-weight:800; }}
 .subtitle {{ text-align:center; color:{SOFT}; font-size:1.1rem; }}
 .sudoku-wrap {{ display:flex; justify-content:center; }}
 .sudoku {{ border-collapse:collapse; margin: 0 auto; }}
 .sudoku td {{ width:36px; height:36px; text-align:center; border:1px solid #cda9bb; font-weight:700; }}
+.cake-stage {{ display:flex; flex-direction:column; align-items:center; justify-content:center; padding:1.5rem 0 1rem; }}
+.cake-top {{ display:flex; align-items:flex-end; justify-content:center; gap:18px; height:95px; margin-bottom:-3px; position:relative; z-index:2; }}
+.candle {{ position:relative; width:13px; height:66px; border-radius:4px 4px 2px 2px; background:repeating-linear-gradient(135deg,#fff 0px,#fff 5px,#ff8bb0 5px,#ff8bb0 10px); box-shadow:0 2px 3px #b45d7a55; }}
+.flame {{ position:absolute; width:15px; height:23px; left:-1px; top:-24px; background:radial-gradient(ellipse at 50% 70%,#fff5a8 0 20%,#ffb52e 45%,#ff6b35 72%,transparent 74%); border-radius:55% 45% 55% 45%; transform:rotate(4deg); filter:drop-shadow(0 0 5px #ffbd45); animation:flicker .7s ease-in-out infinite alternate; }}
+@keyframes flicker {{ from {{ transform:rotate(-5deg) scale(.92); }} to {{ transform:rotate(5deg) scale(1.06); }} }}
+.cake-top.blown .flame {{ display:none; }}
+.cake-body {{ width:min(330px,85vw); height:100px; position:relative; border-radius:16px 16px 24px 24px; background:linear-gradient(180deg,#ffb6ca 0%,#ff8fab 100%); border:3px solid #f4779c; box-shadow:0 8px 0 #e86b92; }}
+.cake-icing {{ position:absolute; top:-8px; left:-3px; right:-3px; height:27px; border-radius:14px 14px 12px 12px; background:#fff1f6; border:2px solid #ffc5d7; }}
+.cake-icing:after {{ content:'♡　♡　♡　♡　♡'; position:absolute; width:100%; top:2px; text-align:center; color:#ff6b98; font-size:16px; letter-spacing:3px; }}
+.cake-plate {{ width:min(365px,92vw); height:15px; margin-top:8px; border-radius:50%; background:linear-gradient(#fff,#ffd8e5); border:2px solid #f5b2c8; }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -176,10 +190,9 @@ def show_sudoku():
         st.markdown("".join(html), unsafe_allow_html=True)
         return
 
-    # Each heart-marked blank is an input directly inside the board.
-    # Select a number in that cell; no separate row/column selector is needed.
-    st.caption("Click a heart cell and choose its number directly in the grid.")
-    cell_options = ["♡"] + [str(n) for n in range(1, 10)]
+    # Each empty cell is a numeric input: on a phone, tap the cell and type
+    # the digit directly with the numeric keyboard (no dropdown needed).
+    st.caption("Tap any ♡ cell and type a number from 1–9. Use 0 to clear a cell.")
     changed_cells = []
     for r in range(9):
         cols = st.columns(9, gap="small")
@@ -187,41 +200,42 @@ def show_sudoku():
             with cols[c]:
                 if (r, c) in HEART_BLANKS:
                     current = board[r][c]
-                    current_label = str(current) if current else "♡"
-                    choice = st.selectbox(
+                    value = st.number_input(
                         f"Row {r+1}, column {c+1}",
-                        cell_options,
-                        index=cell_options.index(current_label),
+                        min_value=0, max_value=9, step=1,
+                        value=int(current),
                         key=f"sudoku_cell_{r}_{c}",
                         label_visibility="collapsed",
+                        help=f"Row {r+1}, column {c+1}: enter 1–9; enter 0 to clear.",
                     )
-                    if choice != current_label:
-                        changed_cells.append((r, c, choice))
+                    if int(value) != int(current):
+                        changed_cells.append((r, c, int(value)))
                 else:
+                    val = board[r][c]
+                    bg = '#fff' if (r+c)%2 == 0 else '#faeef4'
+                    borders = [
+                        'border-top:3px solid #3a1f3d' if r % 3 == 0 else '',
+                        'border-left:3px solid #3a1f3d' if c % 3 == 0 else '',
+                        'border-right:3px solid #3a1f3d' if c == 8 else '',
+                        'border-bottom:3px solid #3a1f3d' if r == 8 else '',
+                    ]
                     st.markdown(
                         f"<div style='height:39px;display:flex;align-items:center;justify-content:center;"
-                        f"font-weight:700;color:{INK};background:{'#fff' if (r+c)%2 == 0 else '#faeef4'};"
-                        f"border:1px solid #cda9bb;border-top:{'3px solid #3a1f3d' if r%3==0 else '1px solid #cda9bb'};"
-                        f"border-left:{'3px solid #3a1f3d' if c%3==0 else '1px solid #cda9bb'};"
-                        f"border-right:{'3px solid #3a1f3d' if c==8 else '1px solid #cda9bb'};"
-                        f"border-bottom:{'3px solid #3a1f3d' if r==8 else '1px solid #cda9bb'};"
-                        f"box-sizing:border-box'>{board[r][c]}</div>",
+                        f"font-weight:700;color:{INK};background:{bg};border:1px solid #cda9bb;"
+                        f"{';'.join(x for x in borders if x)};box-sizing:border-box'>{val}</div>",
                         unsafe_allow_html=True,
                     )
 
-    # Apply one changed cell per rerun and validate it.
+    # Accept the typed digit immediately. Conflicts are highlighted so the
+    # player can correct them without fighting a dropdown or losing the input.
     if changed_cells:
-        r, c, choice = changed_cells[0]
-        value = 0 if choice == "♡" else int(choice)
-        if value == 0:
-            board[r][c] = 0
-            st.session_state.last_message = ""
-        elif sudoku_valid(board, r, c, value):
-            board[r][c] = value
-            st.session_state.last_message = "Correct move! Keep going. 💗"
-        else:
-            st.session_state.last_message = "No repeats in that row, column, or 3×3 box."
+        r, c, value = changed_cells[0]
+        board[r][c] = value
         st.session_state.sudoku_board = board
+        st.session_state.last_message = "" if value == 0 else (
+            "Correct move! Keep going. 💗" if sudoku_valid(board, r, c, value)
+            else "There is a repeat in this row, column, or 3×3 box. You can change the number."
+        )
         st.rerun()
 
     c1, c2 = st.columns(2)
@@ -229,6 +243,8 @@ def show_sudoku():
         if st.button("Reset puzzle", use_container_width=True):
             st.session_state.sudoku_board = [row[:] for row in PUZZLE]
             st.session_state.last_message = ""
+            for r, c in HEART_BLANKS:
+                st.session_state.pop(f"sudoku_cell_{r}_{c}", None)
             st.rerun()
     with c2:
         if st.button("Skip to Memory Match", use_container_width=True):
@@ -341,16 +357,28 @@ def show_gift():
 
 def show_cake():
     st.markdown('<div class="heart-title">Happy Birthday, Martin! 🎂</div>', unsafe_allow_html=True)
-    st.markdown("<div style='text-align:center;font-size:7rem'>🎂🕯️🕯️🕯️</div>", unsafe_allow_html=True)
-    st.write("There's a little gift waiting. Make a wish and blow out the candles!")
-    if not st.session_state.candles_blown:
+    blown = st.session_state.candles_blown
+    # Candles are anchored visually to the cake; blowing only removes their flames.
+    candle_html = "".join('<div class="candle">' + ('' if blown else '<div class="flame"></div>') + '</div>' for _ in range(3))
+    st.markdown(
+        f'<div class="cake-stage">'
+        f'<div class="cake-top {"blown" if blown else "lit"}">{candle_html}</div>'
+        f'<div class="cake-body"><div class="cake-icing"></div></div>'
+        f'<div class="cake-plate"></div></div>',
+        unsafe_allow_html=True,
+    )
+    if not blown:
+        st.write("There's a little wish waiting for you. Make a wish and blow out the candles!")
         if st.button("💨 Blow out the candles", use_container_width=True):
             st.session_state.candles_blown = True
             st.balloons()
             st.rerun()
     else:
-        st.success("Make a wish! ✨")
-        if st.button("Read your birthday letter", use_container_width=True):
+        st.success("The candles are out! Make a wish, birthday boy. ✨💗")
+        if st.button("Light the candles again 🕯️", use_container_width=True):
+            st.session_state.candles_blown = False
+            st.rerun()
+        if st.button("Read your birthday letter 💌", use_container_width=True):
             go("letter"); st.rerun()
 
 def show_letter():
