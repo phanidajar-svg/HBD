@@ -1,4 +1,5 @@
 import random
+import base64
 import streamlit as st
 from pathlib import Path
 
@@ -60,25 +61,25 @@ div.stButton > button {{
 }}
 div.stButton > button:hover {{ background: #e63e68; color: white; border-color: #e63e68; }}
 div[data-testid="stRadio"] label {{ color: {INK} !important; }}
+/* Mobile Sudoku: keep each row as nine narrow cells instead of stacking them. */
+div[data-testid="stHorizontalBlock"] {{ flex-wrap: nowrap !important; gap: 2px !important; }}
+div[data-testid="stHorizontalBlock"] > div[data-testid="column"] {{
+  min-width: 0 !important; width: 0 !important; flex: 1 1 0% !important;
+  padding: 0 !important;
+}}
 /* Compact numeric fields: tap a Sudoku cell and type with the phone keypad. */
+div[data-testid="stNumberInput"] {{ width: 100% !important; min-width: 0 !important; }}
 div[data-testid="stNumberInput"] button {{ display:none !important; }}
-div[data-testid="stNumberInput"] input {{ text-align:center !important; padding-left:0.1rem !important; padding-right:0.1rem !important; font-size:0.95rem !important; }}
-div[data-testid="stNumberInput"] div {{ border-radius:5px !important; }}
+div[data-testid="stNumberInput"] input {{
+  text-align:center !important; min-width:0 !important; width:100% !important;
+  padding:0 !important; font-size:0.9rem !important; height:38px !important;
+}}
+div[data-testid="stNumberInput"] > div {{ border-radius:0 !important; min-width:0 !important; }}
 .heart-title {{ text-align:center; color:{ACC}; font-size: 2.4rem; font-weight:800; }}
 .subtitle {{ text-align:center; color:{SOFT}; font-size:1.1rem; }}
 .sudoku-wrap {{ display:flex; justify-content:center; }}
 .sudoku {{ border-collapse:collapse; margin: 0 auto; }}
 .sudoku td {{ width:36px; height:36px; text-align:center; border:1px solid #cda9bb; font-weight:700; }}
-.cake-stage {{ display:flex; flex-direction:column; align-items:center; justify-content:center; padding:1.5rem 0 1rem; }}
-.cake-top {{ display:flex; align-items:flex-end; justify-content:center; gap:18px; height:95px; margin-bottom:-3px; position:relative; z-index:2; }}
-.candle {{ position:relative; width:13px; height:66px; border-radius:4px 4px 2px 2px; background:repeating-linear-gradient(135deg,#fff 0px,#fff 5px,#ff8bb0 5px,#ff8bb0 10px); box-shadow:0 2px 3px #b45d7a55; }}
-.flame {{ position:absolute; width:15px; height:23px; left:-1px; top:-24px; background:radial-gradient(ellipse at 50% 70%,#fff5a8 0 20%,#ffb52e 45%,#ff6b35 72%,transparent 74%); border-radius:55% 45% 55% 45%; transform:rotate(4deg); filter:drop-shadow(0 0 5px #ffbd45); animation:flicker .7s ease-in-out infinite alternate; }}
-@keyframes flicker {{ from {{ transform:rotate(-5deg) scale(.92); }} to {{ transform:rotate(5deg) scale(1.06); }} }}
-.cake-top.blown .flame {{ display:none; }}
-.cake-body {{ width:min(330px,85vw); height:100px; position:relative; border-radius:16px 16px 24px 24px; background:linear-gradient(180deg,#ffb6ca 0%,#ff8fab 100%); border:3px solid #f4779c; box-shadow:0 8px 0 #e86b92; }}
-.cake-icing {{ position:absolute; top:-8px; left:-3px; right:-3px; height:27px; border-radius:14px 14px 12px 12px; background:#fff1f6; border:2px solid #ffc5d7; }}
-.cake-icing:after {{ content:'♡　♡　♡　♡　♡'; position:absolute; width:100%; top:2px; text-align:center; color:#ff6b98; font-size:16px; letter-spacing:3px; }}
-.cake-plate {{ width:min(365px,92vw); height:15px; margin-top:8px; border-radius:50%; background:linear-gradient(#fff,#ffd8e5); border:2px solid #f5b2c8; }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -192,7 +193,7 @@ def show_sudoku():
 
     # Each empty cell is a numeric input: on a phone, tap the cell and type
     # the digit directly with the numeric keyboard (no dropdown needed).
-    st.caption("Tap any ♡ cell and type a number from 1–9. Use 0 to clear a cell.")
+    st.caption("Tap a ♡ cell and enter 1–9 using your phone keyboard. Enter 0 to clear.")
     changed_cells = []
     for r in range(9):
         cols = st.columns(9, gap="small")
@@ -355,33 +356,48 @@ def show_gift():
         if st.button("Continue to the cake", use_container_width=True):
             go("cake"); st.rerun()
 
-def show_cake():
-    st.markdown('<div class="heart-title">Happy Birthday, Martin! 🎂</div>', unsafe_allow_html=True)
-    blown = st.session_state.candles_blown
-    # Candles are anchored visually to the cake; blowing only removes their flames.
-    candle_html = "".join('<div class="candle">' + ('' if blown else '<div class="flame"></div>') + '</div>' for _ in range(3))
+def show_birthday_music():
+    """Play a gentle original instrumental loop on the Cake and Letter scenes."""
+    music_path = Path(__file__).parent / "cute_instrumental.wav"
     st.markdown(
-        f'<div class="cake-stage">'
-        f'<div class="cake-top {"blown" if blown else "lit"}">{candle_html}</div>'
-        f'<div class="cake-body"><div class="cake-icing"></div></div>'
-        f'<div class="cake-plate"></div></div>',
+        '<div style="text-align:center;font-weight:700;color:#ff4f78;font-size:1.05rem">'
+        '🎶 A little birthday soundtrack for you 💗</div>',
         unsafe_allow_html=True,
     )
-    if not blown:
-        st.write("There's a little wish waiting for you. Make a wish and blow out the candles!")
+    if music_path.exists():
+        # Embed audio in the page so it also works when deployed to Streamlit Cloud.
+        audio_b64 = base64.b64encode(music_path.read_bytes()).decode("ascii")
+        html = (
+            '<!doctype html><html><body style="margin:0;background:transparent;">'
+            '<audio controls autoplay loop playsinline style="width:100%;height:44px;">'
+            f'<source src="data:audio/wav;base64,{audio_b64}" type="audio/wav">'
+            'Your browser does not support audio playback.</audio>'
+            '<div style="font:12px sans-serif;color:#7a5a7c;text-align:center;margin-top:4px;">'
+            'แตะปุ่มเล่นเพื่อฟังเพลง · ใช้ปุ่มในแถบเสียงเพื่อหยุดหรือปิดเสียงได้'
+            '</div></body></html>'
+        )
+        st.components.v1.html(html, height=68, scrolling=False)
+    else:
+        st.info("วางไฟล์ cute_instrumental.wav ไว้ในโฟลเดอร์เดียวกับ HBD.py เพื่อเปิดเพลงประกอบ")
+
+
+def show_cake():
+    show_birthday_music()
+    st.markdown('<div class="heart-title">Happy Birthday, Martin! 🎂</div>', unsafe_allow_html=True)
+    st.markdown("<div style='text-align:center;font-size:7rem'>🎂🕯️🕯️🕯️</div>", unsafe_allow_html=True)
+    st.write("There's a little gift waiting. Make a wish and blow out the candles!")
+    if not st.session_state.candles_blown:
         if st.button("💨 Blow out the candles", use_container_width=True):
             st.session_state.candles_blown = True
             st.balloons()
             st.rerun()
     else:
-        st.success("The candles are out! Make a wish, birthday boy. ✨💗")
-        if st.button("Light the candles again 🕯️", use_container_width=True):
-            st.session_state.candles_blown = False
-            st.rerun()
-        if st.button("Read your birthday letter 💌", use_container_width=True):
+        st.success("Make a wish! ✨")
+        if st.button("Read your birthday letter", use_container_width=True):
             go("letter"); st.rerun()
 
 def show_letter():
+    show_birthday_music()
     st.markdown(f'<div class="heart-title">Happy Birthday, {CONFIG["name"]}! 💌</div>', unsafe_allow_html=True)
     st.markdown(f'<div style="background:#fff;padding:1.5rem;border-radius:18px;white-space:pre-wrap;line-height:1.8;color:{INK}">{CONFIG["letter"]}</div>', unsafe_allow_html=True)
     photo_path = Path(__file__).parent / CONFIG["photo"]
