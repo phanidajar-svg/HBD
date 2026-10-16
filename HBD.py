@@ -356,11 +356,6 @@ def show_gift():
             go("cake"); st.rerun()
 
 def show_cake():
-    st.markdown(
-        '<div class="heart-title">Happy Birthday, Martin! 🎂</div>',
-        unsafe_allow_html=True
-    )
-
     # 🎵 Birthday music — play only on the cake page
     music_path = Path(__file__).parent / "cute_instrumental.wav"
 
