@@ -52,7 +52,7 @@ SOFT = "#7a5a7c"
 st.markdown(f"""
 <style>
 .stApp {{ background: {BG}; color: {INK}; }}
-.block-container {{ max-width: 560px; padding: 1.1rem 1rem 2.2rem; }}
+.block-container {{ max-width: 760px; padding-top: 1.5rem; padding-bottom: 3rem; }}
 h1, h2, h3, p, label {{ color: {INK} !important; }}
 div.stButton > button {{
   border-radius: 18px; border: 1px solid #f5b7cc; background: #ff4f78;
@@ -60,37 +60,25 @@ div.stButton > button {{
 }}
 div.stButton > button:hover {{ background: #e63e68; color: white; border-color: #e63e68; }}
 div[data-testid="stRadio"] label {{ color: {INK} !important; }}
-/* Sudoku-specific responsive CSS is defined below and scoped to its board. */
-.heart-title {{ text-align:center; color:{ACC}; font-size: clamp(1.55rem, 5vw, 2.25rem); font-weight:850; line-height:1.2; margin: .35rem 0 .65rem; }}
-.subtitle {{ text-align:center; color:{SOFT}; font-size:1rem; margin-bottom:.7rem; }}
-.sudoku-card {{ background:rgba(255,255,255,.65); border:1px solid #f4c5d5; border-radius:20px; padding:clamp(8px, 2.5vw, 15px); box-shadow:0 8px 24px rgba(125,55,88,.08); margin:.7rem 0 1rem; }}
-.sudoku-wrap {{ width:100%; max-width:440px; margin:0 auto; }}
-.sudoku {{ border-collapse:collapse; table-layout:fixed; width:100%; aspect-ratio:1/1; }}
-.sudoku td {{ width:11.111%; height:auto; aspect-ratio:1/1; text-align:center; vertical-align:middle; border:1px solid #e5b7ca; font-size:clamp(12px, 3.8vw, 19px); font-weight:750; padding:0; }}
-.sudoku td.fixed {{ background:#fffafd; color:{INK}; }}
-.sudoku td.blank {{ background:#fff0f6; color:#e56b9b; }}
-.sudoku td.filled {{ background:#ffe0eb; color:{ACC}; }}
-.sudoku td.selected {{ outline:2px solid {ACC}; outline-offset:-3px; background:#ffd0e0; }}
-@media (max-width:480px) {{ .block-container {{ padding-left:.35rem; padding-right:.35rem; }} .stButton button {{ font-size:.88rem; }} }}
-/* Direct-tap Sudoku board: keep nine square cells in each row on phones. */
-div.st-key-sudoku_grid div[data-testid="stHorizontalBlock"] {{
-  flex-wrap: nowrap !important; gap: 1px !important;
-}}
-div.st-key-sudoku_grid div[data-testid="column"] {{
-  min-width: 0 !important; width: 0 !important; flex: 1 1 0% !important;
-  padding: 0 !important;
-}}
-div.st-key-sudoku_grid div.stButton > button {{
-  width: 100% !important; min-width: 0 !important; aspect-ratio: 1 / 1 !important;
-  height: auto !important; padding: 0 !important; margin: 0 !important;
-  border-radius: 0 !important; font-size: clamp(10px, 3vw, 16px) !important;
-  line-height: 1 !important; white-space: nowrap !important;
-}}
-div.st-key-sudoku_grid div.stButton > button:disabled {{
-  opacity: 1 !important; background: #fffafd !important; color: #3a1f3d !important;
-  border: 1px solid #e5b7ca !important;
-}}
-@media (max-width:480px) {{ .block-container {{ padding-left:.65rem; padding-right:.65rem; }} .stButton button {{ font-size:.88rem; }} }}
+/* Compact numeric fields: tap a Sudoku cell and type with the phone keypad. */
+div[data-testid="stNumberInput"] button {{ display:none !important; }}
+div[data-testid="stNumberInput"] input {{ text-align:center !important; padding-left:0.1rem !important; padding-right:0.1rem !important; font-size:0.95rem !important; }}
+div[data-testid="stNumberInput"] div {{ border-radius:5px !important; }}
+.heart-title {{ text-align:center; color:{ACC}; font-size: 2.4rem; font-weight:800; }}
+.subtitle {{ text-align:center; color:{SOFT}; font-size:1.1rem; }}
+.sudoku-wrap {{ display:flex; justify-content:center; }}
+.sudoku {{ border-collapse:collapse; margin: 0 auto; }}
+.sudoku td {{ width:36px; height:36px; text-align:center; border:1px solid #cda9bb; font-weight:700; }}
+.cake-stage {{ display:flex; flex-direction:column; align-items:center; justify-content:center; padding:1.5rem 0 1rem; }}
+.cake-top {{ display:flex; align-items:flex-end; justify-content:center; gap:18px; height:95px; margin-bottom:-3px; position:relative; z-index:2; }}
+.candle {{ position:relative; width:13px; height:66px; border-radius:4px 4px 2px 2px; background:repeating-linear-gradient(135deg,#fff 0px,#fff 5px,#ff8bb0 5px,#ff8bb0 10px); box-shadow:0 2px 3px #b45d7a55; }}
+.flame {{ position:absolute; width:15px; height:23px; left:-1px; top:-24px; background:radial-gradient(ellipse at 50% 70%,#fff5a8 0 20%,#ffb52e 45%,#ff6b35 72%,transparent 74%); border-radius:55% 45% 55% 45%; transform:rotate(4deg); filter:drop-shadow(0 0 5px #ffbd45); animation:flicker .7s ease-in-out infinite alternate; }}
+@keyframes flicker {{ from {{ transform:rotate(-5deg) scale(.92); }} to {{ transform:rotate(5deg) scale(1.06); }} }}
+.cake-top.blown .flame {{ display:none; }}
+.cake-body {{ width:min(330px,85vw); height:100px; position:relative; border-radius:16px 16px 24px 24px; background:linear-gradient(180deg,#ffb6ca 0%,#ff8fab 100%); border:3px solid #f4779c; box-shadow:0 8px 0 #e86b92; }}
+.cake-icing {{ position:absolute; top:-8px; left:-3px; right:-3px; height:27px; border-radius:14px 14px 12px 12px; background:#fff1f6; border:2px solid #ffc5d7; }}
+.cake-icing:after {{ content:'♡　♡　♡　♡　♡'; position:absolute; width:100%; top:2px; text-align:center; color:#ff6b98; font-size:16px; letter-spacing:3px; }}
+.cake-plate {{ width:min(365px,92vw); height:15px; margin-top:8px; border-radius:50%; background:linear-gradient(#fff,#ffd8e5); border:2px solid #f5b2c8; }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -170,116 +158,108 @@ def top_progress():
 
 def show_sudoku():
     st.markdown('<div class="heart-title">Easy Sudoku 💗</div>', unsafe_allow_html=True)
-    st.markdown('<div class="subtitle">A little puzzle, made with love · 9×9</div>', unsafe_allow_html=True)
-    st.markdown(
-        '<div style="text-align:center;color:#7a5a7c;font-size:.94rem;margin-bottom:.7rem">'
-        'Tap a heart cell on the board, then tap a number below. No repeats in any row, column, or 3×3 box.'
-        '</div>', unsafe_allow_html=True
-    )
-    board = st.session_state.sudoku_board
+    st.markdown('<div class="subtitle">9×9 board · numbers 1–9</div>', unsafe_allow_html=True)
+    st.write("Fill the heart-marked blanks with 1–9. No repeats in any row, column, or 3×3 box.")
 
+    board = st.session_state.sudoku_board
     if not st.session_state.sudoku_started:
-        html = ['<div class="sudoku-card"><div class="sudoku-wrap"><table class="sudoku">']
+        if st.button("💗 Start Sudoku", use_container_width=True):
+            st.session_state.sudoku_started = True
+            st.rerun()
+        if st.button("Continue", use_container_width=True):
+            go("memory")
+            st.rerun()
+        # Show the puzzle preview before starting.
+        html = ['<div class="sudoku-wrap"><table class="sudoku">']
         for r in range(9):
             html.append("<tr>")
             for c in range(9):
                 val = board[r][c]
-                cls = "fixed" if val else "blank"
+                bg = "#fff" if (r+c)%2 == 0 else "#faeef4"
                 borders = [
-                    "border-top:3px solid #6b3556" if r % 3 == 0 else "",
-                    "border-left:3px solid #6b3556" if c % 3 == 0 else "",
-                    "border-right:3px solid #6b3556" if c == 8 else "",
-                    "border-bottom:3px solid #6b3556" if r == 8 else "",
+                    "border-top:3px solid #3a1f3d" if r % 3 == 0 else "",
+                    "border-left:3px solid #3a1f3d" if c % 3 == 0 else "",
+                    "border-right:3px solid #3a1f3d" if c == 8 else "",
+                    "border-bottom:3px solid #3a1f3d" if r == 8 else "",
                 ]
                 content = str(val) if val else "♡"
-                html.append(f'<td class="{cls}" style="{";".join(x for x in borders if x)}">{content}</td>')
+                color = INK if val else "#e99abb"
+                html.append(f'<td style="background:{bg};color:{color};{";".join(x for x in borders if x)}">{content}</td>')
             html.append("</tr>")
-        html.append("</table></div></div>")
+        html.append("</table></div>")
         st.markdown("".join(html), unsafe_allow_html=True)
-        if st.button("💗 Start Sudoku", use_container_width=True):
-            st.session_state.sudoku_started = True
-            st.rerun()
-        if st.button("Skip to Memory Match →", use_container_width=True):
-            go("memory")
-            st.rerun()
         return
 
-    # Tap a heart cell directly; no row/column dropdown is needed.
-    selected = st.session_state.sudoku_selected
-    with st.container(key="sudoku_grid"):
-        for r in range(9):
-            cols = st.columns(9, gap=None)
-            for c, col in enumerate(cols):
-                with col:
+    # Each empty cell is a numeric input: on a phone, tap the cell and type
+    # the digit directly with the numeric keyboard (no dropdown needed).
+    st.caption("Tap any ♡ cell and type a number from 1–9. Use 0 to clear a cell.")
+    changed_cells = []
+    for r in range(9):
+        cols = st.columns(9, gap="small")
+        for c in range(9):
+            with cols[c]:
+                if (r, c) in HEART_BLANKS:
+                    current = board[r][c]
+                    value = st.number_input(
+                        f"Row {r+1}, column {c+1}",
+                        min_value=0, max_value=9, step=1,
+                        value=int(current),
+                        key=f"sudoku_cell_{r}_{c}",
+                        label_visibility="collapsed",
+                        help=f"Row {r+1}, column {c+1}: enter 1–9; enter 0 to clear.",
+                    )
+                    if int(value) != int(current):
+                        changed_cells.append((r, c, int(value)))
+                else:
                     val = board[r][c]
-                    editable = (r, c) in HEART_BLANKS
-                    is_selected = selected == (r, c)
-                    if editable:
-                        label = str(val) if val else "♡"
-                        if st.button(
-                            label,
-                            key=f"sudoku_cell_{r}_{c}",
-                            use_container_width=True,
-                            type="primary" if is_selected else "secondary",
-                        ):
-                            st.session_state.sudoku_selected = (r, c)
-                            st.rerun()
-                    else:
-                        st.button(
-                            str(val), key=f"sudoku_fixed_{r}_{c}",
-                            use_container_width=True, disabled=True,
-                        )
+                    bg = '#fff' if (r+c)%2 == 0 else '#faeef4'
+                    borders = [
+                        'border-top:3px solid #3a1f3d' if r % 3 == 0 else '',
+                        'border-left:3px solid #3a1f3d' if c % 3 == 0 else '',
+                        'border-right:3px solid #3a1f3d' if c == 8 else '',
+                        'border-bottom:3px solid #3a1f3d' if r == 8 else '',
+                    ]
+                    st.markdown(
+                        f"<div style='height:39px;display:flex;align-items:center;justify-content:center;"
+                        f"font-weight:700;color:{INK};background:{bg};border:1px solid #cda9bb;"
+                        f"{';'.join(x for x in borders if x)};box-sizing:border-box'>{val}</div>",
+                        unsafe_allow_html=True,
+                    )
 
-    selected = st.session_state.sudoku_selected
-    if selected is None:
-        st.info("Tap a ♡ cell to choose where to put a number.")
-    else:
-        r, c = selected
-        st.markdown(
-            f'<div style="text-align:center;color:#7a5a7c;margin:10px 0">'
-            f'💗 Selected: Row {r + 1} · Column {c + 1} · Current: {board[r][c] or "♡"}</div>',
-            unsafe_allow_html=True,
+    # Accept the typed digit immediately. Conflicts are highlighted so the
+    # player can correct them without fighting a dropdown or losing the input.
+    if changed_cells:
+        r, c, value = changed_cells[0]
+        board[r][c] = value
+        st.session_state.sudoku_board = board
+        st.session_state.last_message = "" if value == 0 else (
+            "Correct move! Keep going. 💗" if sudoku_valid(board, r, c, value)
+            else "There is a repeat in this row, column, or 3×3 box. You can change the number."
         )
-        st.markdown('<div style="text-align:center;color:#7a5a7c;font-weight:700;margin:.35rem 0">Choose a number</div>', unsafe_allow_html=True)
-        for row_nums in ((1, 2, 3), (4, 5, 6), (7, 8, 9)):
-            cols = st.columns(3, gap="small")
-            for col, num in zip(cols, row_nums):
-                with col:
-                    if st.button(str(num), key=f"sudoku_num_{num}", use_container_width=True):
-                        board[r][c] = num
-                        st.session_state.sudoku_board = board
-                        st.session_state.last_message = (
-                            "There is a repeat in this row, column, or 3×3 box. Try another number."
-                            if not sudoku_valid(board, r, c, num)
-                            else "Nice move! Keep going. 💗"
-                        )
-                        st.rerun()
-        if st.button("⌫ Clear selected cell", use_container_width=True):
-            board[r][c] = 0
-            st.session_state.sudoku_board = board
-            st.session_state.last_message = ""
-            st.rerun()
+        st.rerun()
 
     c1, c2 = st.columns(2)
     with c1:
         if st.button("Reset puzzle", use_container_width=True):
             st.session_state.sudoku_board = [row[:] for row in PUZZLE]
-            st.session_state.sudoku_selected = None
             st.session_state.last_message = ""
+            for r, c in HEART_BLANKS:
+                st.session_state.pop(f"sudoku_cell_{r}_{c}", None)
             st.rerun()
     with c2:
-        if st.button("Skip to Memory →", use_container_width=True):
+        if st.button("Skip to Memory Match", use_container_width=True):
             go("memory")
             st.rerun()
 
     if st.session_state.last_message:
-        if "repeat" in st.session_state.last_message:
+        if "No repeats" in st.session_state.last_message:
             st.warning(st.session_state.last_message)
         else:
             st.info(st.session_state.last_message)
+
     if sudoku_solved():
         st.success("Perfect! You solved the Sudoku! ❤️")
-        if st.button("Continue to Memory Match 💎", use_container_width=True):
+        if st.button("Continue to Memory Match", use_container_width=True):
             go("memory")
             st.rerun()
 
@@ -375,40 +355,56 @@ def show_gift():
         if st.button("Continue to the cake", use_container_width=True):
             go("cake"); st.rerun()
 
-def birthday_music_player():
-    """Happy Birthday instrumental with browser-native play/pause and volume controls."""
-    music_path = Path(__file__).parent / "cute_instrumental.wav"
+def show_cake():
+    
+def show_cake():
     st.markdown(
-        '<div style="text-align:center;color:#7a5a7c;font-weight:650;">🎵 A little birthday music for you 💗</div>',
+        '<div class="heart-title">Happy Birthday, Martin! 🎂</div>',
+        unsafe_allow_html=True
+    )
+
+    # 🎵 Birthday music — play only on the cake page
+    music_path = Path(__file__).parent / "cute_instrumental.wav"
+
+    if music_path.exists():
+        st.audio(
+            str(music_path),
+            format="audio/wav",
+            autoplay=True,
+            loop=True,
+        )
+
+    blown = st.session_state.candles_blown
+
+    # โค้ดส่วนที่เหลือของ show_cake() ใช้ของเดิมต่อได้เลย
+
+    st.markdown('<div class="heart-title">Happy Birthday, Martin! 🎂</div>', unsafe_allow_html=True)
+    blown = st.session_state.candles_blown
+    # Candles are anchored visually to the cake; blowing only removes their flames.
+    candle_html = "".join('<div class="candle">' + ('' if blown else '<div class="flame"></div>') + '</div>' for _ in range(3))
+    st.markdown(
+        f'<div class="cake-stage">'
+        f'<div class="cake-top {"blown" if blown else "lit"}">{candle_html}</div>'
+        f'<div class="cake-body"><div class="cake-icing"></div></div>'
+        f'<div class="cake-plate"></div></div>',
         unsafe_allow_html=True,
     )
-    if music_path.exists():
-        # Browsers on phones usually require a user tap before audio can start.
-        # Native audio controls provide play/pause and volume controls on mobile.
-        st.audio(str(music_path), format="audio/wav", loop=True, autoplay=False)
-        st.caption("Tap ▶ to play. You can pause or adjust the volume anytime.")
-    else:
-        st.info("Add `cute_instrumental.wav` beside `HBD.py` to enable the birthday music.")
-
-
-def show_cake():
-    st.markdown('<div class="heart-title">Happy Birthday, Martin! 🎂</div>', unsafe_allow_html=True)
-    birthday_music_player()
-    st.markdown("<div style='text-align:center;font-size:7rem'>🎂🕯️🕯️🕯️</div>", unsafe_allow_html=True)
-    st.write("There's a little gift waiting. Make a wish and blow out the candles!")
-    if not st.session_state.candles_blown:
+    if not blown:
+        st.write("There's a little wish waiting for you. Make a wish and blow out the candles!")
         if st.button("💨 Blow out the candles", use_container_width=True):
             st.session_state.candles_blown = True
             st.balloons()
             st.rerun()
     else:
-        st.success("Make a wish! ✨")
-        if st.button("Read your birthday letter", use_container_width=True):
+        st.success("The candles are out! Make a wish, birthday boy. ✨💗")
+        if st.button("Light the candles again 🕯️", use_container_width=True):
+            st.session_state.candles_blown = False
+            st.rerun()
+        if st.button("Read your birthday letter 💌", use_container_width=True):
             go("letter"); st.rerun()
 
 def show_letter():
     st.markdown(f'<div class="heart-title">Happy Birthday, {CONFIG["name"]}! 💌</div>', unsafe_allow_html=True)
-    birthday_music_player()
     st.markdown(f'<div style="background:#fff;padding:1.5rem;border-radius:18px;white-space:pre-wrap;line-height:1.8;color:{INK}">{CONFIG["letter"]}</div>', unsafe_allow_html=True)
     photo_path = Path(__file__).parent / CONFIG["photo"]
     if photo_path.exists():
