@@ -356,8 +356,6 @@ def show_gift():
             go("cake"); st.rerun()
 
 def show_cake():
-    
-def show_cake():
     st.markdown(
         '<div class="heart-title">Happy Birthday, Martin! 🎂</div>',
         unsafe_allow_html=True
